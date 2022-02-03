@@ -15,6 +15,7 @@
 
 package com.github.b3er.reflect.factory
 
+import java.time.Clock
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
@@ -22,16 +23,17 @@ import kotlin.reflect.typeOf
 
 @Suppress("UNCHECKED_CAST")
 internal fun <T, R : List<T>> KType.newList(
-    size: Int, skipDefaults: Boolean = false,
-    listsRange: IntRange = 0..10,
-    mapsRange: IntRange = 0..10,
-    numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
-    reduce: T.() -> T = { this }
+    size: Int,
+    skipDefaults: Boolean,
+    listsRange: IntRange,
+    mapsRange: IntRange,
+    numberRange: LongRange,
+    clock: Clock
 ): R {
     val listType = arguments.firstOrNull()?.type
         ?: throw IllegalArgumentException("Can't resolve type ${arguments.firstOrNull()} for list $this")
 
-    val list = listType.newObjects(size, skipDefaults, listsRange, mapsRange, numberRange, reduce)
+    val list = listType.newObjects<T>(size, skipDefaults, listsRange, mapsRange, numberRange, clock)
 
     return when (this.classifier) {
         List::class, MutableList::class, Collection::class, Iterable::class -> list

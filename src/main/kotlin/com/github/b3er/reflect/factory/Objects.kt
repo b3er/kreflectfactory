@@ -16,10 +16,12 @@
 package com.github.b3er.reflect.factory
 
 import java.math.BigDecimal
+import java.time.*
 import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
+import kotlin.reflect.full.withNullability
 import kotlin.reflect.typeOf
 
 
@@ -28,15 +30,17 @@ import kotlin.reflect.typeOf
  * @param skipDefaults skip randomizing of parameters with default values
  * @param collectionRange lists and maps size range for parameters
  * @param numberRange number values range for parameters
+ * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
  */
 inline fun <reified T> newObject(
     skipDefaults: Boolean = false,
     collectionRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
+    clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.() -> T = { this }
 ): T {
-    return typeOf<T>().newObject(skipDefaults, collectionRange, collectionRange, numberRange, reduce)
+    return typeOf<T>().newObject(skipDefaults, collectionRange, collectionRange, numberRange, clock, reduce)
 }
 
 /**
@@ -45,6 +49,7 @@ inline fun <reified T> newObject(
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
  * @param numberRange number values range for parameters
+ * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
  */
 inline fun <reified T> newObject(
@@ -52,9 +57,10 @@ inline fun <reified T> newObject(
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
+    clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.() -> T = { this }
 ): T {
-    return typeOf<T>().newObject(skipDefaults, listsRange, mapsRange, numberRange, reduce)
+    return typeOf<T>().newObject(skipDefaults, listsRange, mapsRange, numberRange, clock, reduce)
 }
 
 /**
@@ -63,6 +69,7 @@ inline fun <reified T> newObject(
  * @param skipDefaults skip randomizing of parameters with default values
  * @param collectionRange lists and maps size range for parameters
  * @param numberRange number values range for parameters
+ * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
  */
 inline fun <reified T> newObjects(
@@ -70,9 +77,10 @@ inline fun <reified T> newObjects(
     skipDefaults: Boolean = false,
     collectionRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
+    clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.() -> T = { this }
 ): List<T> {
-    return typeOf<T>().newObjects(size, skipDefaults, collectionRange, collectionRange, numberRange, reduce)
+    return typeOf<T>().newObjects(size, skipDefaults, collectionRange, collectionRange, numberRange, clock, reduce)
 }
 
 
@@ -83,6 +91,7 @@ inline fun <reified T> newObjects(
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
  * @param numberRange number values range for parameters
+ * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
  */
 inline fun <reified T> newObjects(
@@ -91,9 +100,10 @@ inline fun <reified T> newObjects(
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
+    clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.() -> T = { this }
 ): List<T> {
-    return typeOf<T>().newObjects(size, skipDefaults, listsRange, mapsRange, numberRange, reduce)
+    return typeOf<T>().newObjects(size, skipDefaults, listsRange, mapsRange, numberRange, clock, reduce)
 }
 
 /**
@@ -103,6 +113,7 @@ inline fun <reified T> newObjects(
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
  * @param numberRange number values range for parameters
+ * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
  */
 fun <T> KType.newObjects(
@@ -111,11 +122,12 @@ fun <T> KType.newObjects(
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
+    clock: Clock = RandomClock.SYSTEM_DEFAULT,
     reduce: T.() -> T = { this }
 ): List<T> {
     val result = ArrayList<T>(size)
     repeat(size) {
-        result.add(newObject(skipDefaults, listsRange, mapsRange, numberRange, reduce))
+        result.add(newObject(skipDefaults, listsRange, mapsRange, numberRange, clock, reduce))
     }
     return result
 }
@@ -126,6 +138,7 @@ fun <T> KType.newObjects(
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
  * @param numberRange number values range for parameters
+ * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
  */
 @Suppress("UNCHECKED_CAST")
@@ -134,45 +147,54 @@ fun <T> KType.newObject(
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
+    clock: Clock = RandomClock.SYSTEM_DEFAULT,
     reduce: T.() -> T = { this }
 ): T {
+    val nonNullType = withNullability(false)
+
     @Suppress("IMPLICIT_CAST_TO_ANY", "TYPE_MISMATCH_WARNING")
     val result = when {
-        this == typeOf<Boolean>() -> newBoolean()
-        this == typeOf<Char>() -> newInt(numberRange).toChar()
-        this == typeOf<Short>() -> newInt(numberRange).toShort()
-        this == typeOf<Int>() -> newInt(numberRange)
-        this == typeOf<Long>() -> newLong(numberRange)
-        this == typeOf<Float>() -> newFloat(numberRange)
-        this == typeOf<Double>() -> newDouble(numberRange)
-        this == typeOf<BigDecimal>() -> newBigDecimal(numberRange)
-        this == typeOf<String>() -> newString()
-        this == typeOf<UUID>() -> UUID.randomUUID()
-        this == typeOf<BooleanArray>() -> BooleanArray(listsRange.random()) { newBoolean() }
-        this == typeOf<CharArray>() -> CharArray(listsRange.random()) { newInt(numberRange).toChar() }
-        this == typeOf<ShortArray>() -> ShortArray(listsRange.random()) { newInt(numberRange).toShort() }
-        this == typeOf<IntArray>() -> IntArray(listsRange.random()) { newInt(numberRange) }
-        this == typeOf<LongArray>() -> LongArray(listsRange.random()) { newLong(numberRange) }
-        this == typeOf<FloatArray>() -> FloatArray(listsRange.random()) { newFloat(numberRange) }
-        this == typeOf<DoubleArray>() -> DoubleArray(listsRange.random()) { newDouble(numberRange) }
-        isSubtypeOf(typeOf<Enum<*>>()) -> newEnum(classifier as KClass<out Enum<*>>)
-        isSubtypeOf(typeOf<Collection<*>>()) -> {
-            newList<Any, List<Any>>(listsRange.random(), skipDefaults, listsRange, mapsRange, numberRange)
+        nonNullType == typeOf<Boolean>() -> newBoolean()
+        nonNullType == typeOf<Char>() -> newInt(numberRange).toChar()
+        nonNullType == typeOf<Short>() -> newInt(numberRange).toShort()
+        nonNullType == typeOf<Int>() -> newInt(numberRange)
+        nonNullType == typeOf<Long>() -> newLong(numberRange)
+        nonNullType == typeOf<Float>() -> newFloat(numberRange)
+        nonNullType == typeOf<Double>() -> newDouble(numberRange)
+        nonNullType == typeOf<BigDecimal>() -> newBigDecimal(numberRange)
+        nonNullType == typeOf<String>() -> newString()
+        nonNullType == typeOf<UUID>() -> UUID.randomUUID()
+        nonNullType == typeOf<BooleanArray>() -> BooleanArray(listsRange.random()) { newBoolean() }
+        nonNullType == typeOf<CharArray>() -> CharArray(listsRange.random()) { newInt(numberRange).toChar() }
+        nonNullType == typeOf<ShortArray>() -> ShortArray(listsRange.random()) { newInt(numberRange).toShort() }
+        nonNullType == typeOf<IntArray>() -> IntArray(listsRange.random()) { newInt(numberRange) }
+        nonNullType == typeOf<LongArray>() -> LongArray(listsRange.random()) { newLong(numberRange) }
+        nonNullType == typeOf<FloatArray>() -> FloatArray(listsRange.random()) { newFloat(numberRange) }
+        nonNullType == typeOf<DoubleArray>() -> DoubleArray(listsRange.random()) { newDouble(numberRange) }
+        nonNullType == typeOf<OffsetDateTime>() -> OffsetDateTime.ofInstant(clock.instant(), clock.zone)
+        nonNullType == typeOf<ZonedDateTime>() -> ZonedDateTime.ofInstant(clock.instant(), clock.zone)
+        nonNullType == typeOf<LocalDateTime>() -> LocalDateTime.ofInstant(clock.instant(), clock.zone)
+        nonNullType == typeOf<LocalDate>() -> LocalDate.ofInstant(clock.instant(), clock.zone)
+        nonNullType == typeOf<LocalTime>() -> LocalTime.ofInstant(clock.instant(), clock.zone)
+        nonNullType.isSubtypeOf(typeOf<Enum<*>>()) -> newEnum(classifier as KClass<out Enum<*>>)
+        nonNullType.isSubtypeOf(typeOf<Collection<*>>()) -> {
+            newList<Any, List<Any>>(listsRange.random(), skipDefaults, listsRange, mapsRange, numberRange, clock)
         }
-        isSubtypeOf(typeOf<Array<*>>()) -> {
+        nonNullType.isSubtypeOf(typeOf<Array<*>>()) -> {
             newList<Any, List<Any>>(
                 listsRange.random(),
                 skipDefaults,
                 listsRange,
                 mapsRange,
-                numberRange
+                numberRange,
+                clock
             ).toTypedArray()
         }
-        isSubtypeOf(typeOf<Map<*, *>>()) -> {
-            newMap<Any, Any, Map<Any, Any>>(mapsRange.random(), skipDefaults, listsRange, mapsRange, numberRange)
+        nonNullType.isSubtypeOf(typeOf<Map<*, *>>()) -> {
+            newMap<Any, Any, Map<Any, Any>>(mapsRange.random(), skipDefaults, listsRange, mapsRange, numberRange, clock)
         }
         classifier is KClass<*> -> {
-            newClassObject(classifier as KClass<*>, skipDefaults, listsRange, mapsRange, numberRange)
+            newClassObject(classifier as KClass<*>, skipDefaults, listsRange, mapsRange, numberRange, clock)
         }
         else -> {
             throw IllegalArgumentException("Type $this is not supported")

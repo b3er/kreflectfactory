@@ -15,6 +15,7 @@
 
 package com.github.b3er.reflect.factory
 
+import java.time.Clock
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
@@ -23,10 +24,11 @@ import kotlin.reflect.typeOf
 @Suppress("UNCHECKED_CAST")
 internal fun <K, V, R : Map<K, V>> KType.newMap(
     size: Int,
-    skipDefaults: Boolean = false,
-    listsRange: IntRange = 0..10,
-    mapsRange: IntRange = 0..10,
-    numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE
+    skipDefaults: Boolean,
+    listsRange: IntRange,
+    mapsRange: IntRange,
+    numberRange: LongRange,
+    clock: Clock
 ): R {
     val keyType = arguments.getOrNull(0)?.type
         ?: throw IllegalArgumentException("Can't resolve key type ${arguments.firstOrNull()} for map $this")
@@ -34,8 +36,8 @@ internal fun <K, V, R : Map<K, V>> KType.newMap(
         ?: throw IllegalArgumentException("Can't resolve value type ${arguments.firstOrNull()} for map $this")
 
     val map = newObjectsMap(
-        keyType.newObjects<K>(size, skipDefaults, listsRange, mapsRange, numberRange),
-        valueType.newObjects<V>(size, skipDefaults, listsRange, mapsRange, numberRange)
+        keyType.newObjects<K>(size, skipDefaults, listsRange, mapsRange, numberRange, clock),
+        valueType.newObjects<V>(size, skipDefaults, listsRange, mapsRange, numberRange, clock)
     )
 
     return when (this.classifier) {

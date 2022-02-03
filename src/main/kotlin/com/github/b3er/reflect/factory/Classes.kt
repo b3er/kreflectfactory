@@ -15,22 +15,23 @@
 
 package com.github.b3er.reflect.factory
 
+import java.time.Clock
 import kotlin.reflect.KClass
 
 internal fun <T : Any> newClassObject(
     cls: KClass<T>,
-    skipDefaults: Boolean = false,
-    listsRange: IntRange = 0..10,
-    mapsRange: IntRange = 0..10,
-    numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
-    reduce: T.() -> T = { this }
+    skipDefaults: Boolean,
+    listsRange: IntRange,
+    mapsRange: IntRange,
+    numberRange: LongRange,
+    clock: Clock
 ): T {
     val primaryConstructor = cls.constructors.first()
     val args = primaryConstructor.parameters
         .asSequence()
         .filterNot { skipDefaults && it.isOptional }
         .associateBy({ it }) {
-            it.type.newObject<T>(skipDefaults, listsRange, mapsRange, numberRange)
+            it.type.newObject<T>(skipDefaults, listsRange, mapsRange, numberRange, clock)
         }
-    return primaryConstructor.callBy(args).let(reduce)
+    return primaryConstructor.callBy(args)
 }
