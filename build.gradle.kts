@@ -27,7 +27,7 @@ tasks.withType<KotlinCompile> {
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.0"
+version = "0.9.1"
 plugins.withId("maven-publish") {
     publishing {
         publications {
