@@ -10,21 +10,22 @@ dependencies {
     testImplementation(libs.kotlin.test)
 }
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(11))
+    }
+}
+
 tasks.test {
     useJUnitPlatform()
 }
 
-java {
-    sourceCompatibility = JavaVersion.VERSION_1_8
-    targetCompatibility = JavaVersion.VERSION_1_8
-}
-
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "1.8"
+    kotlinOptions.jvmTarget = "11"
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.3"
+version = "0.9.4"
 plugins.withId("maven-publish") {
     publishing {
         publications {
