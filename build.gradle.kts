@@ -5,9 +5,6 @@ plugins {
     `maven-publish`
 }
 
-group = "me.b3er"
-version = "1.0-SNAPSHOT"
-
 dependencies {
     implementation(libs.kotlin.reflect)
     testImplementation(libs.kotlin.test)
@@ -27,7 +24,7 @@ tasks.withType<KotlinCompile> {
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.1"
+version = "0.9.2"
 plugins.withId("maven-publish") {
     publishing {
         publications {
