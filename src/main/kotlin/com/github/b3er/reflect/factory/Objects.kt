@@ -16,6 +16,7 @@
 package com.github.b3er.reflect.factory
 
 import java.math.BigDecimal
+import java.util.*
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
@@ -146,6 +147,7 @@ fun <T> KType.newObject(
         this == typeOf<Double>() -> newDouble(numberRange)
         this == typeOf<BigDecimal>() -> newBigDecimal(numberRange)
         this == typeOf<String>() -> newString()
+        this == typeOf<UUID>() -> UUID.randomUUID()
         this == typeOf<BooleanArray>() -> BooleanArray(listsRange.random()) { newBoolean() }
         this == typeOf<CharArray>() -> CharArray(listsRange.random()) { newInt(numberRange).toChar() }
         this == typeOf<ShortArray>() -> ShortArray(listsRange.random()) { newInt(numberRange).toShort() }
