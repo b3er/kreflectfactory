@@ -78,7 +78,7 @@ inline fun <reified T> newObjects(
     collectionRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
-    noinline reduce: T.() -> T = { this }
+    noinline reduce: T.(index: Int) -> T = { this }
 ): List<T> {
     return typeOf<T>().newObjects(size, skipDefaults, collectionRange, collectionRange, numberRange, clock, reduce)
 }
@@ -101,7 +101,7 @@ inline fun <reified T> newObjects(
     mapsRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
-    noinline reduce: T.() -> T = { this }
+    noinline reduce: T.(index: Int) -> T = { this }
 ): List<T> {
     return typeOf<T>().newObjects(size, skipDefaults, listsRange, mapsRange, numberRange, clock, reduce)
 }
@@ -123,11 +123,13 @@ fun <T> KType.newObjects(
     mapsRange: IntRange = 0..10,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
-    reduce: T.() -> T = { this }
+    reduce: T.(index: Int) -> T = { this }
 ): List<T> {
     val result = ArrayList<T>(size)
     repeat(size) {
-        result.add(newObject(skipDefaults, listsRange, mapsRange, numberRange, clock, reduce))
+        result.add(newObject(skipDefaults, listsRange, mapsRange, numberRange, clock) {
+            reduce(it)
+        })
     }
     return result
 }

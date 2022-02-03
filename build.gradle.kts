@@ -16,16 +16,16 @@ java {
     }
 }
 
-tasks.test {
-    useJUnitPlatform()
-}
-
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
+tasks.test {
+    useJUnitPlatform()
+}
+
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.4"
+version = "0.9.5"
 plugins.withId("maven-publish") {
     publishing {
         publications {
