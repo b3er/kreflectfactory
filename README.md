@@ -1,4 +1,4 @@
-KMapper [![Jitpack](https://jitpack.io/v/b3er/kreflectfactory.svg)](https://jitpack.io/v/b3er/kreflectfactory) [![](https://jitci.com/gh/b3er/kreflectfactory/svg)](https://jitci.com/gh/b3er/kreflectfactory)
+KReflectFactory [![Jitpack](https://jitpack.io/v/b3er/kreflectfactory.svg)](https://jitpack.io/v/b3er/kreflectfactory) [![](https://jitci.com/gh/b3er/kreflectfactory/svg)](https://jitci.com/gh/b3er/kreflectfactory)
 ===
 Kotlin object creation inspired by [kfactories](https://github.com/cashapp/kfactories) using reflection
 
