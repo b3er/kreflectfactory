@@ -178,6 +178,8 @@ fun <T> KType.newObject(
         nonNullType == typeOf<LocalDateTime>() -> LocalDateTime.ofInstant(clock.instant(), clock.zone)
         nonNullType == typeOf<LocalDate>() -> LocalDate.ofInstant(clock.instant(), clock.zone)
         nonNullType == typeOf<LocalTime>() -> LocalTime.ofInstant(clock.instant(), clock.zone)
+        nonNullType == typeOf<Period>() -> Period.ofDays(newInt(numberRange))
+        nonNullType == typeOf<Duration>() -> Duration.ofMillis(newLong(numberRange))
         nonNullType.isSubtypeOf(typeOf<Enum<*>>()) -> newEnum(classifier as KClass<out Enum<*>>)
         nonNullType.isSubtypeOf(typeOf<Collection<*>>()) -> {
             newList<Any, List<Any>>(listsRange.random(), skipDefaults, listsRange, mapsRange, numberRange, clock)
