@@ -12,12 +12,12 @@ dependencies {
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(11))
+        languageVersion.set(JavaLanguageVersion.of(8))
     }
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "11"
+    kotlinOptions.jvmTarget = "1.8"
 }
 
 tasks.test {
@@ -25,7 +25,7 @@ tasks.test {
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.6"
+version = "0.9.7"
 plugins.withId("maven-publish") {
     publishing {
         publications {

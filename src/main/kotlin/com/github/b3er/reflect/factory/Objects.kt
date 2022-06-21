@@ -16,8 +16,16 @@
 package com.github.b3er.reflect.factory
 
 import java.math.BigDecimal
-import java.time.*
-import java.util.*
+import java.time.Clock
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.OffsetDateTime
+import java.time.Period
+import java.time.ZonedDateTime
+import java.time.temporal.ChronoField
+import java.util.UUID
 import kotlin.reflect.KClass
 import kotlin.reflect.KType
 import kotlin.reflect.full.isSubtypeOf
@@ -176,8 +184,8 @@ fun <T> KType.newObject(
         nonNullType == typeOf<OffsetDateTime>() -> OffsetDateTime.ofInstant(clock.instant(), clock.zone)
         nonNullType == typeOf<ZonedDateTime>() -> ZonedDateTime.ofInstant(clock.instant(), clock.zone)
         nonNullType == typeOf<LocalDateTime>() -> LocalDateTime.ofInstant(clock.instant(), clock.zone)
-        nonNullType == typeOf<LocalDate>() -> LocalDate.ofInstant(clock.instant(), clock.zone)
-        nonNullType == typeOf<LocalTime>() -> LocalTime.ofInstant(clock.instant(), clock.zone)
+        nonNullType == typeOf<LocalDate>() -> LocalDate.ofEpochDay(clock.instant().getLong(ChronoField.EPOCH_DAY))
+        nonNullType == typeOf<LocalTime>() -> LocalTime.ofNanoOfDay(clock.instant().getLong(ChronoField.NANO_OF_DAY))
         nonNullType == typeOf<Period>() -> Period.ofDays(newInt(numberRange))
         nonNullType == typeOf<Duration>() -> Duration.ofMillis(newLong(numberRange))
         nonNullType.isSubtypeOf(typeOf<Enum<*>>()) -> newEnum(classifier as KClass<out Enum<*>>)
@@ -206,6 +214,5 @@ fun <T> KType.newObject(
     } as T
     return result.reduce()
 }
-
 
 
