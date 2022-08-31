@@ -27,13 +27,14 @@ internal fun <T, R : List<T>> KType.newList(
     skipDefaults: Boolean,
     listsRange: IntRange,
     mapsRange: IntRange,
+    stringRange: IntRange,
     numberRange: LongRange,
     clock: Clock
 ): R {
     val listType = arguments.firstOrNull()?.type
         ?: throw IllegalArgumentException("Can't resolve type ${arguments.firstOrNull()} for list $this")
 
-    val list = listType.newObjects<T>(size, skipDefaults, listsRange, mapsRange, numberRange, clock)
+    val list = listType.newObjects<T>(size, skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock)
 
     return when (this.classifier) {
         List::class, MutableList::class, Collection::class, Iterable::class -> list

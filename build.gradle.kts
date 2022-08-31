@@ -25,7 +25,7 @@ tasks.test {
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.8"
+version = "0.9.9"
 plugins.withId("maven-publish") {
     publishing {
         publications {

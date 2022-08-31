@@ -27,6 +27,7 @@ internal fun <K, V, R : Map<K, V>> KType.newMap(
     skipDefaults: Boolean,
     listsRange: IntRange,
     mapsRange: IntRange,
+    stringRange: IntRange,
     numberRange: LongRange,
     clock: Clock
 ): R {
@@ -36,8 +37,8 @@ internal fun <K, V, R : Map<K, V>> KType.newMap(
         ?: throw IllegalArgumentException("Can't resolve value type ${arguments.firstOrNull()} for map $this")
 
     val map = newObjectsMap(
-        keyType.newObjects<K>(size, skipDefaults, listsRange, mapsRange, numberRange, clock),
-        valueType.newObjects<V>(size, skipDefaults, listsRange, mapsRange, numberRange, clock)
+        keyType.newObjects<K>(size, skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock),
+        valueType.newObjects<V>(size, skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock)
     )
 
     return when (this.classifier) {

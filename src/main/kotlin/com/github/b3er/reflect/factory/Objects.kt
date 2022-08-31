@@ -36,6 +36,7 @@ import kotlin.reflect.typeOf
  * Create an object of specified type
  * @param skipDefaults skip randomizing of parameters with default values
  * @param collectionRange lists and maps size range for parameters
+ * @param stringRange string length range for parameters
  * @param numberRange number values range for parameters
  * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
@@ -43,11 +44,20 @@ import kotlin.reflect.typeOf
 inline fun <reified T> newObject(
     skipDefaults: Boolean = false,
     collectionRange: IntRange = 0..10,
+    stringRange: IntRange = 0..255,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.() -> T = { this }
 ): T {
-    return typeOf<T>().newObject(skipDefaults, collectionRange, collectionRange, numberRange, clock, reduce)
+    return typeOf<T>().newObject(
+        skipDefaults,
+        collectionRange,
+        collectionRange,
+        stringRange,
+        numberRange,
+        clock,
+        reduce
+    )
 }
 
 /**
@@ -55,6 +65,7 @@ inline fun <reified T> newObject(
  * @param skipDefaults skip randomizing of parameters with default values
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
+ * @param stringRange string length range for parameters
  * @param numberRange number values range for parameters
  * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
@@ -63,11 +74,12 @@ inline fun <reified T> newObject(
     skipDefaults: Boolean = false,
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
+    stringRange: IntRange = 0..255,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.() -> T = { this }
 ): T {
-    return typeOf<T>().newObject(skipDefaults, listsRange, mapsRange, numberRange, clock, reduce)
+    return typeOf<T>().newObject(skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock, reduce)
 }
 
 /**
@@ -75,6 +87,7 @@ inline fun <reified T> newObject(
  * @param size desired count of objects ibn returned list
  * @param skipDefaults skip randomizing of parameters with default values
  * @param collectionRange lists and maps size range for parameters
+ * @param stringRange string length range for parameters
  * @param numberRange number values range for parameters
  * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
@@ -83,11 +96,21 @@ inline fun <reified T> newObjects(
     size: Int,
     skipDefaults: Boolean = false,
     collectionRange: IntRange = 0..10,
+    stringRange: IntRange = 0..255,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.(index: Int) -> T = { this }
 ): List<T> {
-    return typeOf<T>().newObjects(size, skipDefaults, collectionRange, collectionRange, numberRange, clock, reduce)
+    return typeOf<T>().newObjects(
+        size,
+        skipDefaults,
+        collectionRange,
+        collectionRange,
+        stringRange,
+        numberRange,
+        clock,
+        reduce
+    )
 }
 
 
@@ -97,6 +120,7 @@ inline fun <reified T> newObjects(
  * @param skipDefaults skip randomizing of parameters with default values
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
+ * @param stringRange string length range for parameters
  * @param numberRange number values range for parameters
  * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
@@ -106,11 +130,12 @@ inline fun <reified T> newObjects(
     skipDefaults: Boolean = false,
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
+    stringRange: IntRange = 0..255,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
     noinline reduce: T.(index: Int) -> T = { this }
 ): List<T> {
-    return typeOf<T>().newObjects(size, skipDefaults, listsRange, mapsRange, numberRange, clock, reduce)
+    return typeOf<T>().newObjects(size, skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock, reduce)
 }
 
 /**
@@ -119,6 +144,7 @@ inline fun <reified T> newObjects(
  * @param skipDefaults skip randomizing of parameters with default values
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
+ * @param stringRange string length range for parameters
  * @param numberRange number values range for parameters
  * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
@@ -128,13 +154,14 @@ fun <T> KType.newObjects(
     skipDefaults: Boolean = false,
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
+    stringRange: IntRange = 0..255,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
     reduce: T.(index: Int) -> T = { this }
 ): List<T> {
     val result = ArrayList<T>(size)
     repeat(size) {
-        result.add(newObject(skipDefaults, listsRange, mapsRange, numberRange, clock) {
+        result.add(newObject(skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock) {
             reduce(it)
         })
     }
@@ -146,6 +173,7 @@ fun <T> KType.newObjects(
  * @param skipDefaults skip randomizing of parameters with default values
  * @param listsRange lists size range for parameters
  * @param mapsRange maps size range for parameters
+ * @param stringRange string length range for parameters
  * @param numberRange number values range for parameters
  * @param clock clock used to create date/time values
  * @param reduce function to reduce created object
@@ -155,6 +183,7 @@ fun <T> KType.newObject(
     skipDefaults: Boolean = false,
     listsRange: IntRange = 0..10,
     mapsRange: IntRange = 0..10,
+    stringRange: IntRange = 1..255,
     numberRange: LongRange = Long.MIN_VALUE..Long.MAX_VALUE,
     clock: Clock = RandomClock.SYSTEM_DEFAULT,
     reduce: T.() -> T = { this }
@@ -171,7 +200,7 @@ fun <T> KType.newObject(
         nonNullType == typeOf<Float>() -> newFloat(numberRange)
         nonNullType == typeOf<Double>() -> newDouble(numberRange)
         nonNullType == typeOf<BigDecimal>() -> newBigDecimal(numberRange)
-        nonNullType == typeOf<String>() -> newString()
+        nonNullType == typeOf<String>() -> newString(stringRange)
         nonNullType == typeOf<UUID>() -> UUID.randomUUID()
         nonNullType == typeOf<BooleanArray>() -> BooleanArray(listsRange.random()) { newBoolean() }
         nonNullType == typeOf<CharArray>() -> CharArray(listsRange.random()) { newInt(numberRange).toChar() }
@@ -189,24 +218,53 @@ fun <T> KType.newObject(
         nonNullType == typeOf<Duration>() -> Duration.ofMillis(newLong(numberRange))
         nonNullType.isSubtypeOf(typeOf<Enum<*>>()) -> newEnum(classifier as KClass<out Enum<*>>)
         nonNullType.isSubtypeOf(typeOf<Collection<*>>()) -> {
-            newList<Any, List<Any>>(listsRange.random(), skipDefaults, listsRange, mapsRange, numberRange, clock)
+            newList<Any, List<Any>>(
+                listsRange.random(),
+                skipDefaults,
+                listsRange,
+                mapsRange,
+                stringRange,
+                numberRange,
+                clock
+            )
         }
+
         nonNullType.isSubtypeOf(typeOf<Array<*>>()) -> {
             newList<Any, List<Any>>(
                 listsRange.random(),
                 skipDefaults,
                 listsRange,
                 mapsRange,
+                stringRange,
                 numberRange,
                 clock
             ).toTypedArray()
         }
+
         nonNullType.isSubtypeOf(typeOf<Map<*, *>>()) -> {
-            newMap<Any, Any, Map<Any, Any>>(mapsRange.random(), skipDefaults, listsRange, mapsRange, numberRange, clock)
+            newMap<Any, Any, Map<Any, Any>>(
+                mapsRange.random(),
+                skipDefaults,
+                listsRange,
+                mapsRange,
+                stringRange,
+                numberRange,
+                clock
+            )
         }
+
         classifier is KClass<*> -> {
-            newClassObject(classifier as KClass<*>, skipDefaults, listsRange, mapsRange, numberRange, clock)
+            newClassObject(
+                classifier as KClass<*>,
+                skipDefaults,
+                listsRange,
+                mapsRange,
+                stringRange,
+                numberRange,
+                clock
+            )
         }
+
         else -> {
             throw IllegalArgumentException("Type $this is not supported")
         }

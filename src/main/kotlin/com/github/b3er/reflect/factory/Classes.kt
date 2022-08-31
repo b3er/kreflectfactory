@@ -23,6 +23,7 @@ internal fun <T : Any> newClassObject(
     skipDefaults: Boolean,
     listsRange: IntRange,
     mapsRange: IntRange,
+    stringRange: IntRange,
     numberRange: LongRange,
     clock: Clock
 ): T {
@@ -31,7 +32,7 @@ internal fun <T : Any> newClassObject(
         .asSequence()
         .filterNot { skipDefaults && it.isOptional }
         .associateBy({ it }) {
-            it.type.newObject<T>(skipDefaults, listsRange, mapsRange, numberRange, clock)
+            it.type.newObject<T>(skipDefaults, listsRange, mapsRange, stringRange, numberRange, clock)
         }
     return primaryConstructor.callBy(args)
 }
