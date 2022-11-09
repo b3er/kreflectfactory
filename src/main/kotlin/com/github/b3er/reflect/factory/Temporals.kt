@@ -18,6 +18,7 @@ package com.github.b3er.reflect.factory
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneId
+import kotlin.random.Random
 
 /**
  * A random clock
@@ -26,13 +27,15 @@ import java.time.ZoneId
  * @param max minimum @Instant to use, defaults to '2222-12-31 23:59:59'
  */
 class RandomClock(
+    private val random: Random = Random,
     private val zone: ZoneId? = ZoneId.systemDefault(),
     private val min: Instant = Instant.ofEpochMilli(0),
     private val max: Instant = Instant.parse("2222-12-31T23:59:59Z")
 ) : Clock() {
     override fun getZone(): ZoneId? = zone
-    override fun withZone(zone: ZoneId?): Clock = RandomClock(zone)
-    override fun instant(): Instant = Instant.ofEpochMilli(newLong(min = min.toEpochMilli(), max = max.toEpochMilli()))
+    override fun withZone(zone: ZoneId?): Clock = RandomClock(random, zone)
+    override fun instant(): Instant =
+        Instant.ofEpochMilli(newLong(min = min.toEpochMilli(), max = max.toEpochMilli(), random))
 
     companion object {
         val SYSTEM_DEFAULT = RandomClock()

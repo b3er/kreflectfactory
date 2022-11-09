@@ -1,5 +1,6 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+@Suppress("DSL_SCOPE_VIOLATION")
 plugins {
     alias(libs.plugins.kotlin.jvm)
     `maven-publish`
@@ -25,7 +26,7 @@ tasks.test {
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "0.9.9"
+version = "1.0.10"
 plugins.withId("maven-publish") {
     publishing {
         publications {
@@ -36,7 +37,7 @@ plugins.withId("maven-publish") {
                     licenses {
                         license {
                             name.set("The Apache Software License, Version 2.0")
-                            url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                            url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
                             distribution.set("repo")
                         }
                     }

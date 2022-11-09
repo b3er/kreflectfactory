@@ -23,24 +23,24 @@ import kotlin.reflect.KClass
  * Create new random enum value picked from list
  * @param values values to select random enum value from
  */
-fun <T : Enum<T>> newEnum(vararg values: T): T {
-    return values[Random.nextInt(values.size)]
+fun <T : Enum<T>> newEnum(random: Random, vararg values: T): T {
+    return values[random.nextInt(values.size)]
 }
 
 /**
  * Create new random enum value picked from list
  * @param values values to select random enum value from
  */
-fun <T : Enum<*>> newEnum(values: List<T>): T {
-    return values[Random.nextInt(values.size)]
+fun <T : Enum<*>> newEnum(values: List<T>, random: Random): T {
+    return values[random.nextInt(values.size)]
 }
 
 /**
  * Create new random enum value
  */
-inline fun <reified T : Enum<T>> newEnum(): T = newEnum(T::class)
+inline fun <reified T : Enum<T>> newEnum(random: Random): T = newEnum(T::class, random)
 
 @PublishedApi
-internal fun <T : Enum<T>> newEnum(cls: KClass<T>): T {
-    return newEnum(*cls.java.enumConstants)
+internal fun <T : Enum<T>> newEnum(cls: KClass<T>, random: Random): T {
+    return newEnum(random, *cls.java.enumConstants)
 }

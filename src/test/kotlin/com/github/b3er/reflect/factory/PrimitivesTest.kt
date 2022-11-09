@@ -4,13 +4,15 @@ package com.github.b3er.reflect.factory
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.RepeatedTest
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.math.abs
+import kotlin.random.Random
 import kotlin.test.assertEquals
+import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-
 class PrimitivesTest {
     @Nested
     inner class `#newBoolean` {
@@ -21,6 +23,20 @@ class PrimitivesTest {
                 val value = newBoolean()
                 assertNotNull(value)
                 assertIs<Boolean>(value)
+            }
+
+            @RepeatedTest(10)
+            fun `returns true boolean with fixed random`() {
+                val value = newBoolean(Random(1))
+                assertNotNull(value)
+                assertFalse(value)
+            }
+
+            @RepeatedTest(10)
+            fun `returns false boolean with fixed random`() {
+                val value = newBoolean(Random(1000))
+                assertNotNull(value)
+                assertFalse(value)
             }
         }
 
@@ -55,6 +71,15 @@ class PrimitivesTest {
                 // number of minimum values should suffice. The error case here is if there's
                 // only one distinct value.
                 assert(values.distinct().count() > 50)
+            }
+
+            @RepeatedTest(10)
+            fun `returns same values for fixed random`() {
+                val values = (100..200).asSequence().map { newInt(Random(1)) }
+                // Collision is possible, so guaranteeing there are at least 1/2 of the
+                // number of minimum values should suffice. The error case here is if there's
+                // only one distinct value.
+                assert(values.distinct().count() == 1)
             }
         }
     }
