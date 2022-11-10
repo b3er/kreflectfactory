@@ -191,7 +191,8 @@ fun newFloat(range: LongRange, random: Random = Random): Float {
  */
 fun newFloat(range: ClosedFloatingPointRange<Double>, random: Random = Random): Float {
     return newFloat(range.let {
-        it.start.coerceAtLeast(Float.MIN_VALUE.toDouble())..it.endInclusive.coerceAtMost(Float.MAX_VALUE.toDouble())
+        it.start.coerceAtLeast(Float.MIN_VALUE.toDouble())
+            .toInt()..it.endInclusive.coerceAtMost(Float.MAX_VALUE.toDouble()).toInt()
     }, random)
 }
 
