@@ -92,10 +92,7 @@ interface ObjectGenerator {
         val valueType = arguments.getOrNull(1)?.type
             ?: throw IllegalArgumentException("Can't resolve value type ${arguments.firstOrNull()} for map $this")
 
-        val map = generateObjectsMap(
-            generateSequence(keyType).toList(),
-            generateSequence(valueType).toList()
-        )
+        val map = generateSequence(keyType).associateBy({ it }) { generate(valueType) }
 
         val classifier = type.classifier
         return when (classifier) {
@@ -107,14 +104,6 @@ interface ObjectGenerator {
                 }?.call(map) ?: throw IllegalStateException("Can't find constructor with map argument for type $this")
             }
         } as R
-    }
-
-    private fun <K, V> generateObjectsMap(keys: List<K>, values: List<V>): Map<K, V> {
-        val result = LinkedHashMap<K, V>(keys.size)
-        repeat(keys.size) {
-            result[keys[it]] = values[it]
-        }
-        return result
     }
 
     companion object {
