@@ -135,15 +135,7 @@ inline fun <reified T> newObject(
 ): T = mapper(generator.generate(typeOf<T>()) as T)
 
 inline fun <reified T> newObjects(
-    generator: ObjectGenerator = RandomObjectGenerator.Default,
-    noinline mapper: T.() -> T = { this }
-): Sequence<T> = with(generator) {
-    @Suppress("UNCHECKED_CAST")
-    (generateSequence(typeOf<T>()) as Sequence<T>).map(mapper)
-}
-
-inline fun <reified T> newObjects(
     size: Int,
     generator: ObjectGenerator = RandomObjectGenerator.Default,
     noinline mapper: T.() -> T = { this }
-): List<T> = newObjects(generator, mapper).take(size).toList()
+): List<T> = generateSequence { newObject(generator, mapper) }.take(size).toList()
