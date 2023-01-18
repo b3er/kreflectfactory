@@ -16,12 +16,18 @@
 package com.github.b3er.reflect.factory
 
 import com.github.b3er.reflect.factory.generators.RandomObjectGenerator
+import kotlinx.collections.immutable.ImmutableCollection
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.PersistentCollection
+import kotlinx.collections.immutable.PersistentList
+import kotlinx.collections.immutable.PersistentSet
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.collections.immutable.toImmutableMap
 import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
@@ -41,9 +47,6 @@ interface ObjectGenerator {
             isTypeOf<LongArray>() -> generateSequence(typeOf<Long>()).toList().toTypedArray()
             isTypeOf<FloatArray>() -> generateSequence(typeOf<Float>()).toList().toTypedArray()
             isTypeOf<DoubleArray>() -> generateSequence(typeOf<Double>()).toList().toTypedArray()
-            isSubTypeOf<ImmutableList<*>>() -> generateList<Any, List<Any>>(this).toImmutableList()
-            isSubTypeOf<ImmutableSet<*>>() -> generateList<Any, List<Any>>(this).toImmutableSet()
-            isSubTypeOf<ImmutableMap<*, *>>() -> generateMap<Any, Any, Map<Any, Any>>(this).toImmutableMap()
             isSubTypeOf<Collection<*>>() -> generateList<Any, List<Any>>(this)
             isSubTypeOf<Array<*>>() -> generateList<Any, List<Any>>(this).toTypedArray()
             isSubTypeOf<Map<*, *>>() -> generateMap<Any, Any, Map<Any, Any>>(this)
@@ -81,6 +84,10 @@ interface ObjectGenerator {
         val list = generateSequence(listType).toList()
         val classifier = type.classifier
         return when (classifier) {
+            PersistentSet::class -> list.toPersistentSet()
+            ImmutableSet::class -> list.toImmutableSet()
+            ImmutableCollection::class, ImmutableList::class -> list.toImmutableList()
+            PersistentCollection::class, PersistentList::class -> list.toPersistentList()
             List::class, MutableList::class, Collection::class, Iterable::class -> list
             else -> {
                 val listClass = (classifier as KClass<*>)
@@ -105,6 +112,7 @@ interface ObjectGenerator {
 
         val classifier = type.classifier
         return when (classifier) {
+            ImmutableMap::class -> map.toImmutableMap()
             Map::class, MutableMap::class, AbstractMap::class, HashMap::class, LinkedHashMap::class -> map
             else -> {
                 val mapClass = (classifier as KClass<*>)
