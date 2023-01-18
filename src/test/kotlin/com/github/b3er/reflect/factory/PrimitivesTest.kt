@@ -4,7 +4,6 @@ package com.github.b3er.reflect.factory
 
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.RepeatedTest
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import kotlin.math.abs
 import kotlin.random.Random
@@ -13,6 +12,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertIs
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+
 class PrimitivesTest {
     @Nested
     inner class `#newBoolean` {

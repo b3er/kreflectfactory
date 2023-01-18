@@ -16,6 +16,12 @@
 package com.github.b3er.reflect.factory
 
 import com.github.b3er.reflect.factory.generators.RandomObjectGenerator
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.collections.immutable.toImmutableSet
 import kotlin.reflect.KClass
 import kotlin.reflect.KParameter
 import kotlin.reflect.KType
@@ -35,6 +41,9 @@ interface ObjectGenerator {
             isTypeOf<LongArray>() -> generateSequence(typeOf<Long>()).toList().toTypedArray()
             isTypeOf<FloatArray>() -> generateSequence(typeOf<Float>()).toList().toTypedArray()
             isTypeOf<DoubleArray>() -> generateSequence(typeOf<Double>()).toList().toTypedArray()
+            isSubTypeOf<ImmutableList<*>>() -> generateList<Any, List<Any>>(this).toImmutableList()
+            isSubTypeOf<ImmutableSet<*>>() -> generateList<Any, List<Any>>(this).toImmutableSet()
+            isSubTypeOf<ImmutableMap<*, *>>() -> generateMap<Any, Any, Map<Any, Any>>(this).toImmutableMap()
             isSubTypeOf<Collection<*>>() -> generateList<Any, List<Any>>(this)
             isSubTypeOf<Array<*>>() -> generateList<Any, List<Any>>(this).toTypedArray()
             isSubTypeOf<Map<*, *>>() -> generateMap<Any, Any, Map<Any, Any>>(this)
@@ -120,7 +129,7 @@ interface ObjectGenerator {
 
 inline fun <reified T> newObject(
     generator: ObjectGenerator = RandomObjectGenerator.Default,
-    mapper: T.() -> T = { this }
+    noinline mapper: T.() -> T = { this }
 ): T = mapper(generator.generate(typeOf<T>()) as T)
 
 inline fun <reified T> newObjects(
@@ -128,3 +137,9 @@ inline fun <reified T> newObjects(
     generator: ObjectGenerator = RandomObjectGenerator.Default,
     noinline mapper: T.() -> T = { this }
 ): List<T> = generateSequence { newObject(generator, mapper) }.take(size).toList()
+
+inline fun <reified T> newImmutableObjects(
+    size: Int,
+    generator: ObjectGenerator = RandomObjectGenerator.Default,
+    noinline mapper: T.() -> T = { this }
+): List<T> = generateSequence { newObject(generator, mapper) }.take(size).toImmutableList()

@@ -8,6 +8,7 @@ plugins {
 
 dependencies {
     implementation(libs.kotlin.reflect)
+    implementation(libs.kotlinx.collections.immutable)
     testImplementation(libs.kotlin.test)
 }
 
@@ -26,7 +27,7 @@ tasks.test {
 }
 
 group = "com.github.b3er.kreflectfactory"
-version = "1.0.13"
+version = "1.1.0"
 plugins.withId("maven-publish") {
     publishing {
         publications {
